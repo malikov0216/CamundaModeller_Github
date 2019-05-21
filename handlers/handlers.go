@@ -2,7 +2,7 @@ package handlers
 
 import (
 	conf "../config"
-	//"GoGithub/models"
+	"../models"
 	"encoding/base64"
 	"github.com/gin-gonic/gin"
 	uuid "github.com/satori/go.uuid"
@@ -59,37 +59,45 @@ func CamundaModeller (c *gin.Context) {
 		url = config.RepUrl + endpoint //URL FROM CONFIG
 		fileName = config.FileName
 	)
+
+	msg := new(models.Errors)
 	//Cloning from repository
 	if err := gitClone(username, password, directory, url, plumbing.ReferenceName(config.BranchName)); err != nil {
-		c.JSON(404, gin.H{"message": err.Error()})
+		msg.Message = err.Error()
+		c.JSON(404, msg.Message)
 		return
 	}
 
 	//Change cloned file to file that we got from Camunda
 	a, err  := c.FormFile("diagram_1.bpmn")
 	if err != nil {
-		c.JSON(403, gin.H{"message":err.Error()})
+		msg.Message = err.Error()
+		c.JSON(404, msg.Message)
 		return
 	}
 	if err := c.SaveUploadedFile(a, directory + "/" + fileName); err != nil {
-		c.JSON(402, gin.H{"message": err.Error()})
+		msg.Message = err.Error()
+		c.JSON(404, msg.Message)
 		return
 	}
 
 	//Committing
 	if err := gitCommit(username, directory, fileName); err != nil {
-		c.JSON(400, gin.H{"message": err.Error()})
+		msg.Message = err.Error()
+		c.JSON(404, msg.Message)
 		return
 	}
 	//Pushing
 	if err := gitPush(username, password, directory); err != nil {
-		c.JSON(400, gin.H{"message": err.Error()})
+		msg.Message = err.Error()
+		c.JSON(404, msg.Message)
 		return
 	}
 
 	//Deleting files
 	if err = deleteFile(directory); err != nil {
-		c.JSON(503, gin.H{"message": err.Error()})
+		msg.Message = err.Error()
+		c.JSON(404, msg.Message)
 		return
 	}
 }
