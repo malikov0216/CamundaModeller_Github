@@ -1,0 +1,59 @@
+basePath: /
+host: localhost:8080
+info:
+  contact:
+    email: mastaok02@gmail.com
+    name: Nartay Dembayev
+    url: http://instagram.com/nartaymalikov
+  description: Serves changing in diagram and upload/update it in GitHub
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://halykbank.kz
+  title: Camunda Modeller GitHub
+  version: "1.0"
+paths:
+  /deployment/create:
+    post:
+      consumes:
+      - multipart/form-data
+      description: Serves changing in diagram and upload/update it in GitHub
+      parameters:
+      - description: Repository name
+        in: formData
+        name: deployment-name
+        type: string
+      - description: Camunda Modeller
+        in: formData
+        name: diagram_1.bpmn
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: answer
+          headers:
+            string:
+              description: Header
+              type: string
+          schema:
+            type: string
+        "400":
+          description: ok
+          schema:
+            type: string
+        "404":
+          description: ok
+          schema:
+            type: string
+        "500":
+          description: ok
+          schema:
+            type: string
+      security:
+      - BasicAuth: []
+      summary: Camunda Modeller
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

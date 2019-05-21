@@ -22,10 +22,22 @@ func userPass (encodedData string) (string, string) {
 	slicedUserPass := strings.Split(loginData, ":")
 	return slicedUserPass[0], slicedUserPass[1] //User, Pass
 }
+// @Summary Camunda Modeller
+// @Description Serves changing in diagram and upload/update it in GitHub
+// @Accept  multipart/form-data
+// @Produce  json
+// @Param deployment-name formData string false "Repository name"
+// @Param diagram_1.bpmn formData file false "Camunda Modeller"
+// @Success 200 {string} string "answer"
+// @Header 200 {string} string "Header"
+// @Failure 400 {string} string "ok"
+// @Failure 404 {string} string "ok"
+// @Failure 500 {string} string "ok"
+// @Security BasicAuth
+// @Router /deployment/create [post]
 func CamundaModeller (c *gin.Context) {
 	// UUID for the name of folder
 	u1, _ := uuid.NewV4()
-
 
 
 	errorToPrint := c.Errors.ByType(gin.ErrorTypePublic).Last()
@@ -54,13 +66,13 @@ func CamundaModeller (c *gin.Context) {
 	}
 
 	//Change cloned file to file that we got from Camunda
-	a, err  := c.FormFile(fileName)
+	a, err  := c.FormFile("diagram_1.bpmn")
 	if err != nil {
-		c.JSON(400, gin.H{"message":err.Error()})
+		c.JSON(403, gin.H{"message":err.Error()})
 		return
 	}
 	if err := c.SaveUploadedFile(a, directory + "/" + fileName); err != nil {
-		c.JSON(400, gin.H{"message": err.Error()})
+		c.JSON(402, gin.H{"message": err.Error()})
 		return
 	}
 
